@@ -1,0 +1,819 @@
+<!DOCTYPE html>
+<html lang="ms">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Kembara Burung Comel - FK 1.1.2 Pergerakan Lokomotor</title>
+    <link href="https://fonts.googleapis.com/css2?family=Fredoka+One&family=Nunito:wght@600;800;900&display=swap" rel="stylesheet">
+    <style>
+        :root {
+            --primary: #FF5722;
+            --secondary: #4CAF50;
+            --sky: #29B6F6;
+            --sun: #FFCA28;
+            --purple: #AB47BC;
+            --card-bg: rgba(255, 255, 255, 0.95);
+        }
+
+        * {
+            box-sizing: border-box;
+            user-select: none;
+            font-family: 'Nunito', sans-serif;
+        }
+
+        body {
+            margin: 0;
+            padding: 0;
+            min-height: 100vh;
+            background: linear-gradient(180deg, #81D4FA 0%, #E1F5FE 60%, #A5D6A7 60%, #81C784 100%);
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            overflow-x: hidden;
+            position: relative;
+        }
+
+        /* Animated Clouds */
+        .cloud {
+            position: absolute;
+            background: white;
+            border-radius: 50px;
+            opacity: 0.8;
+            animation: moveClouds linear infinite;
+            z-index: 1;
+        }
+
+        .cloud::before, .cloud::after {
+            content: '';
+            position: absolute;
+            background: white;
+            border-radius: 50%;
+        }
+
+        .cloud1 { width: 120px; height: 40px; top: 8%; animation-duration: 25s; }
+        .cloud1::before { width: 50px; height: 50px; top: -20px; left: 20px; }
+        .cloud1::after { width: 40px; height: 40px; top: -15px; right: 20px; }
+
+        .cloud2 { width: 160px; height: 50px; top: 20%; animation-duration: 35s; animation-delay: -10s; }
+        .cloud2::before { width: 70px; height: 70px; top: -30px; left: 25px; }
+        .cloud2::after { width: 50px; height: 50px; top: -20px; right: 25px; }
+
+        @keyframes moveClouds {
+            0% { left: -200px; }
+            100% { left: 100vw; }
+        }
+
+        /* Main App Container */
+        #app-container {
+            width: 95%;
+            max-width: 850px;
+            min-height: 580px;
+            background: var(--card-bg);
+            border-radius: 32px;
+            box-shadow: 0 20px 40px rgba(0,0,0,0.2), 0 0 0 10px rgba(255,255,255,0.4);
+            z-index: 10;
+            padding: 25px;
+            position: relative;
+            display: flex;
+            flex-direction: column;
+            justify-content: space-between;
+            overflow: hidden;
+        }
+
+        /* Header Bar */
+        .header-bar {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            background: #FFF9C4;
+            padding: 12px 24px;
+            border-radius: 20px;
+            border: 4px solid var(--sun);
+        }
+
+        .student-info {
+            font-family: 'Fredoka One', cursive;
+            font-size: 1.2rem;
+            color: #E65100;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+
+        .star-score {
+            font-family: 'Fredoka One', cursive;
+            font-size: 1.3rem;
+            color: #F57F17;
+            display: flex;
+            align-items: center;
+            gap: 6px;
+        }
+
+        /* Content Screens */
+        .screen {
+            display: none;
+            flex-direction: column;
+            align-items: center;
+            text-align: center;
+            animation: fadeIn 0.4s ease-in-out;
+            padding: 10px 0;
+        }
+
+        .screen.active {
+            display: flex;
+        }
+
+        @keyframes fadeIn {
+            from { opacity: 0; transform: translateY(15px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+
+        h1, h2 {
+            font-family: 'Fredoka One', cursive;
+            color: #0277BD;
+            margin: 10px 0;
+            text-shadow: 2px 2px 0px #E1F5FE;
+        }
+
+        p {
+            font-size: 1.2rem;
+            color: #37474F;
+            margin: 5px 0 15px 0;
+            font-weight: 700;
+        }
+
+        /* Custom Input */
+        .input-group {
+            margin: 20px 0;
+        }
+
+        input[type="text"] {
+            font-size: 1.5rem;
+            padding: 12px 20px;
+            border-radius: 20px;
+            border: 4px solid var(--sky);
+            text-align: center;
+            outline: none;
+            font-weight: 800;
+            color: #0277BD;
+            width: 280px;
+            box-shadow: 0 6px 0 var(--sky);
+        }
+
+        /* Buttons */
+        .btn {
+            font-family: 'Fredoka One', cursive;
+            font-size: 1.4rem;
+            padding: 14px 32px;
+            border: none;
+            border-radius: 50px;
+            cursor: pointer;
+            transition: all 0.1s ease;
+            box-shadow: 0 8px 0 rgba(0,0,0,0.2);
+            display: inline-flex;
+            align-items: center;
+            gap: 10px;
+            margin: 10px;
+            color: white;
+            text-decoration: none;
+        }
+
+        .btn:active {
+            transform: translateY(6px);
+            box-shadow: 0 2px 0 rgba(0,0,0,0.2);
+        }
+
+        .btn-green { background-color: var(--secondary); box-shadow: 0 8px 0 #2E7D32; }
+        .btn-orange { background-color: var(--primary); box-shadow: 0 8px 0 #D84315; }
+        .btn-blue { background-color: var(--sky); box-shadow: 0 8px 0 #0277BD; }
+        .btn-purple { background-color: var(--purple); box-shadow: 0 8px 0 #6A1B9A; }
+
+        /* Avatars & Cards Grid */
+        .grid-cards {
+            display: flex;
+            gap: 20px;
+            justify-content: center;
+            flex-wrap: wrap;
+            margin: 15px 0;
+        }
+
+        .card {
+            background: white;
+            border: 4px solid #B3E5FC;
+            border-radius: 24px;
+            padding: 15px;
+            width: 160px;
+            cursor: pointer;
+            transition: all 0.2s;
+            box-shadow: 0 6px 12px rgba(0,0,0,0.08);
+        }
+
+        .card:hover, .card.selected {
+            transform: scale(1.05);
+            border-color: var(--primary);
+            background: #FFF3E0;
+        }
+
+        .card img, .card .emoji-icon {
+            font-size: 4rem;
+            display: block;
+            margin: 0 auto 10px;
+        }
+
+        /* Character Visualizer for Flying High/Low */
+        .stage-box {
+            width: 100%;
+            height: 220px;
+            background: linear-gradient(180deg, #E0F7FA 0%, #FFF 100%);
+            border: 4px dashed var(--sky);
+            border-radius: 24px;
+            position: relative;
+            margin: 15px 0;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            overflow: hidden;
+        }
+
+        .bird-avatar {
+            font-size: 5rem;
+            position: absolute;
+            transition: all 0.6s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+        }
+
+        .bird-avatar.tinggi {
+            top: 20px;
+            transform: scale(1.2) rotate(-5deg);
+            animation: flapHigh 0.4s infinite alternate;
+        }
+
+        .bird-avatar.rendah {
+            bottom: 20px;
+            transform: scale(0.9) rotate(5deg);
+            animation: flapLow 0.8s infinite alternate;
+        }
+
+        @keyframes flapHigh {
+            from { transform: translateY(0) scale(1.2); }
+            to { transform: translateY(-10px) scale(1.25); }
+        }
+
+        @keyframes flapLow {
+            from { transform: translateY(0) scale(0.9); }
+            to { transform: translateY(-5px) scale(0.85); }
+        }
+
+        /* Game Command Display */
+        .command-banner {
+            font-family: 'Fredoka One', cursive;
+            font-size: 2.2rem;
+            padding: 15px 30px;
+            border-radius: 30px;
+            color: white;
+            text-shadow: 2px 2px 0 rgba(0,0,0,0.3);
+            margin: 10px 0;
+            animation: pulse 1s infinite alternate;
+        }
+
+        .command-tinggi { background: #FF9800; border: 4px solid #E65100; }
+        .command-rendah { background: #00BCD4; border: 4px solid #006064; }
+
+        @keyframes pulse {
+            from { transform: scale(0.98); }
+            to { transform: scale(1.03); }
+        }
+
+        /* Badges & Rating */
+        .badge {
+            display: inline-block;
+            background: #FFD54F;
+            color: #5D4037;
+            font-size: 1.2rem;
+            padding: 6px 16px;
+            border-radius: 20px;
+            font-weight: 800;
+            margin: 5px;
+        }
+
+        .progress-bar {
+            width: 100%;
+            height: 18px;
+            background: #E0E0E0;
+            border-radius: 10px;
+            overflow: hidden;
+            margin: 10px 0;
+        }
+
+        .progress-fill {
+            height: 100%;
+            background: var(--secondary);
+            width: 0%;
+            transition: width 0.3s ease;
+        }
+
+        /* Certificate View */
+        .cert-card {
+            border: 8px goldenrod double;
+            background: #FFFDE7;
+            padding: 20px;
+            border-radius: 20px;
+            margin: 10px 0;
+            width: 100%;
+        }
+    </style>
+</head>
+<body>
+
+    <!-- Background Clouds -->
+    <div class="cloud cloud1"></div>
+    <div class="cloud cloud2"></div>
+
+    <div id="app-container">
+        
+        <!-- Header Bar -->
+        <div class="header-bar">
+            <div class="student-info">
+                <span>👤</span> <span id="display-student-name">Murid Prasekolah</span>
+            </div>
+            <div class="star-score">
+                <span>⭐</span> <span id="star-count">0</span> Bintang
+            </div>
+        </div>
+
+        <!-- SCREEN 0: LOGIN / NAMA MURID -->
+        <div id="screen-login" class="screen active">
+            <h1>🦅 Kembara Burung Comel 🐤</h1>
+            <p>Aktiviti Fizikal: Pergerakan Terbang Tinggi & Terbang Rendah</p>
+            <div style="font-size: 5rem; margin: 10px;">🦅 🌸 🐝</div>
+            
+            <div class="input-group">
+                <p>Masukkan Nama Anda:</p>
+                <input type="text" id="input-name" placeholder="Nama Murid..." maxlength="15">
+            </div>
+
+            <p>Pilih Watak Haiwan Anda:</p>
+            <div class="grid-cards">
+                <div class="card selected" onclick="selectAvatar('🦅 Burung', '🦅')">
+                    <span class="emoji-icon">🦅</span>
+                    <b>Burung</b>
+                </div>
+                <div class="card" onclick="selectAvatar('🦋 Rama-Rama', '🦋')">
+                    <span class="emoji-icon">🦋</span>
+                    <b>Rama-rama</b>
+                </div>
+                <div class="card" onclick="selectAvatar('🐝 Lebah', '🐝')">
+                    <span class="emoji-icon">🐝</span>
+                    <b>Lebah</b>
+                </div>
+            </div>
+
+            <button class="btn btn-green" onclick="startApp()">🚀 Mula Main!</button>
+        </div>
+
+        <!-- SCREEN 1: SET INDUKSI - KENALI HAIWAN TERBANG -->
+        <div id="screen-induksi" class="screen">
+            <span class="badge">Langkah 1: Set Induksi</span>
+            <h2>Soalan: Haiwan Manakah Boleh Terbang? 💭</h2>
+            <p>Tekan pada haiwan yang boleh terbang di udara!</p>
+
+            <div class="grid-cards" id="animal-quiz-grid">
+                <div class="card" onclick="checkAnimal(true, this)">
+                    <span class="emoji-icon">🦅</span>
+                    <b>Burung</b>
+                </div>
+                <div class="card" onclick="checkAnimal(false, this)">
+                    <span class="emoji-icon">🐱</span>
+                    <b>Kucing</b>
+                </div>
+                <div class="card" onclick="checkAnimal(true, this)">
+                    <span class="emoji-icon">🐝</span>
+                    <b>Lebah</b>
+                </div>
+                <div class="card" onclick="checkAnimal(false, this)">
+                    <span class="emoji-icon">🐘</span>
+                    <b>Gajah</b>
+                </div>
+            </div>
+
+            <div id="induksi-feedback" style="min-height: 30px; font-weight: 800; color: var(--primary);"></div>
+
+            <button id="btn-to-demo" class="btn btn-blue" style="display: none;" onclick="showScreen('screen-demo')">Seterusnya: Belajar Pergerakan ➡️</button>
+        </div>
+
+        <!-- SCREEN 2: DEMO PERGERAKAN (TERBANG RENDAH vs TINGGI) -->
+        <div id="screen-demo" class="screen">
+            <span class="badge">Langkah 2: Tunjuk Cara & Panduan</span>
+            <h2>Mari Belajar Aksi Terbang! 👐</h2>
+            <p>Tekan butang di bawah dan ikuti aksi pergerakan badan bersama-sama!</p>
+
+            <div class="stage-box">
+                <div id="demo-avatar" class="bird-avatar rendah">🦅</div>
+            </div>
+
+            <div style="display: flex; gap: 15px; justify-content: center;">
+                <button class="btn btn-orange" onclick="playDemo('rendah')">👇 Terbang Rendah<br><small>(Bongkokkan Badan)</small></button>
+                <button class="btn btn-purple" onclick="playDemo('tinggi')">👆 Terbang Tinggi<br><small>(Berdiri Tegak & Jengket)</small></button>
+            </div>
+
+            <div id="demo-instruction" style="margin-top: 15px; font-size: 1.1rem; color: #0277BD; font-weight: 800;">
+                Klik butang di atas untuk melihat demonstrasi.
+            </div>
+
+            <button class="btn btn-green" style="margin-top: 20px;" onclick="startChallenge()">🎮 Mula Cabaran Permainan!</button>
+        </div>
+
+        <!-- SCREEN 3: CABARAN UTAMA (SIMON SAYS / PERMAINAN INTERAKSI) -->
+        <div id="screen-game" class="screen">
+            <div style="display: flex; justify-content: space-between; width: 100%; align-items: center;">
+                <span class="badge">Langkah 3: Cabaran Fizikal</span>
+                <span id="speed-indicator" class="badge" style="background:#E1BEE7;">Kelajuan: Normal 🐢</span>
+            </div>
+
+            <h2>Dengar & Buat Aksi Segera! 🏃‍♂️</h2>
+            
+            <div class="progress-bar">
+                <div id="game-progress" class="progress-fill"></div>
+            </div>
+
+            <div id="command-box" class="command-banner command-tinggi">
+                PERSIAPAN...
+            </div>
+
+            <div class="stage-box">
+                <div id="game-avatar" class="bird-avatar rendah">🦅</div>
+            </div>
+
+            <p>Tekan Aksi Yang Betul Berdasarkan Arahan Di Atas:</p>
+
+            <div style="display: flex; gap: 20px;">
+                <button class="btn btn-orange" onclick="submitAction('rendah')">👇 TERBANG RENDAH</button>
+                <button class="btn btn-purple" onclick="submitAction('tinggi')">👆 TERBANG TINGGI</button>
+            </div>
+        </div>
+
+        <!-- SCREEN 4: PENUTUP (REGANGAN & SOAL JAWAB/REFLEKSI) -->
+        <div id="screen-penutup" class="screen">
+            <span class="badge">Langkah 4: Penutup & Regangan</span>
+            <h2>Masa Menenangkan Badan (Cooling Down) 🧘‍♀️</h2>
+            <p>Mari lakukan regangan ringan bersama-sama. Tarik nafas perlahan-lahan...</p>
+
+            <div style="font-size: 5rem; animation: pulse 2s infinite;" id="cooldown-icon">🧘‍♂️</div>
+            
+            <div id="stretch-timer" style="font-size: 2rem; font-family: 'Fredoka One'; color: var(--secondary);">
+                10 Saat Regangan
+            </div>
+
+            <button id="btn-to-quiz" class="btn btn-blue" onclick="startRefleksiQuiz()" style="margin-top: 20px;">
+                Jawab Soalan Refleksi 🧩
+            </button>
+        </div>
+
+        <!-- SCREEN 5: KUIZ REFLEKSI -->
+        <div id="screen-quiz" class="screen">
+            <span class="badge">Refleksi Pembelajaran</span>
+            <h2 id="quiz-question">Soalan Refleksi</h2>
+
+            <div class="grid-cards" id="quiz-options">
+                <!-- Options rendered dynamically -->
+            </div>
+
+            <div id="quiz-feedback" style="font-weight: 800; margin: 15px; min-height: 25px;"></div>
+        </div>
+
+        <!-- SCREEN 6: SIJIL & CADANGAN TP GURU -->
+        <div id="screen-cert" class="screen">
+            <h2>🎉 SYABAS & TAHNIAH! 🎉</h2>
+            <p>Anda telah berjaya menyelesaikan aktiviti pembelajaran hari ini!</p>
+
+            <div class="cert-card">
+                <h1 style="color: #D84315;">SIJIL PENCAPAIAN FIZIKAL</h1>
+                <p>Dianugerahkan kepada:</p>
+                <h2 id="cert-name" style="color: #0277BD; font-size: 2rem;">-</h2>
+                <p>Objektif: <i>Melakukan aksi terbang rendah dan tinggi dengan imbangan badan yang baik (FK 1.1.2)</i></p>
+                
+                <div style="margin: 15px 0;">
+                    <span class="badge" style="font-size: 1.4rem; background: #FFF9C4;">⭐ Jumlah Bintang: <span id="cert-stars">0</span></span>
+                    <span class="badge" id="cert-tp" style="font-size: 1.4rem; background: #C8E6C9; color: #1B5E20;">Tahap Penguasaan: TP3</span>
+                </div>
+
+                <p id="cert-eval" style="font-size: 1rem; color: #555;">
+                    Ulasan Guru: Murid menunjukkan penguasaan sangat baik dalam koordinasi pergerakan lokomotor dan mengikut arahan dengan tepat.
+                </p>
+            </div>
+
+            <button class="btn btn-green" onclick="location.reload()">🔄 Main Semula</button>
+        </div>
+
+    </div>
+
+    <script>
+        // Game State Variables
+        let studentName = "";
+        let selectedAvatarIcon = "🦅";
+        let stars = 0;
+        let gameRound = 0;
+        const maxRounds = 6;
+        let currentCommand = "";
+        let gameTimer = null;
+        let speedLevel = 1; // 1: Normal, 2: Laju
+        let quizIndex = 0;
+
+        // Sound Effects Engine using Web Audio API
+        const audioCtx = new (window.AudioContext || window.webkitAudioContext)();
+
+        function playSound(type) {
+            if (audioCtx.state === 'suspended') {
+                audioCtx.resume();
+            }
+            const osc = audioCtx.createOscillator();
+            const gain = audioCtx.createGain();
+            osc.connect(gain);
+            gain.connect(audioCtx.destination);
+
+            if (type === 'success') {
+                osc.type = 'triangle';
+                osc.frequency.setValueAtTime(523.25, audioCtx.currentTime); // C5
+                osc.frequency.exponentialRampToValueAtTime(880, audioCtx.currentTime + 0.3); // A5
+                gain.gain.setValueAtTime(0.3, audioCtx.currentTime);
+                gain.gain.exponentialRampToValueAtTime(0.01, audioCtx.currentTime + 0.3);
+                osc.start();
+                osc.stop(audioCtx.currentTime + 0.3);
+            } else if (type === 'wrong') {
+                osc.type = 'sawtooth';
+                osc.frequency.setValueAtTime(220, audioCtx.currentTime);
+                osc.frequency.exponentialRampToValueAtTime(110, audioCtx.currentTime + 0.3);
+                gain.gain.setValueAtTime(0.3, audioCtx.currentTime);
+                gain.gain.exponentialRampToValueAtTime(0.01, audioCtx.currentTime + 0.3);
+                osc.start();
+                osc.stop(audioCtx.currentTime + 0.3);
+            } else if (type === 'star') {
+                osc.type = 'sine';
+                osc.frequency.setValueAtTime(659.25, audioCtx.currentTime); // E5
+                osc.frequency.exponentialRampToValueAtTime(1318.51, audioCtx.currentTime + 0.2); // E6
+                gain.gain.setValueAtTime(0.2, audioCtx.currentTime);
+                gain.gain.exponentialRampToValueAtTime(0.01, audioCtx.currentTime + 0.2);
+                osc.start();
+                osc.stop(audioCtx.currentTime + 0.2);
+            }
+        }
+
+        // Text-to-Speech Helper (Speech Synthesis)
+        function speak(text) {
+            if ('speechSynthesis' in window) {
+                window.speechSynthesis.cancel(); // stop previous
+                const utterance = new SpeechSynthesisUtterance(text);
+                utterance.lang = 'ms-MY'; // Malay speech rate/pitch
+                utterance.rate = 0.9;
+                utterance.pitch = 1.1;
+                window.speechSynthesis.speak(utterance);
+            }
+        }
+
+        function addStars(num) {
+            stars += num;
+            document.getElementById('star-count').innerText = stars;
+            playSound('star');
+        }
+
+        function selectAvatar(name, icon) {
+            selectedAvatarIcon = icon;
+            document.querySelectorAll('#screen-login .card').forEach(c => c.classList.remove('selected'));
+            event.currentTarget.classList.add('selected');
+        }
+
+        function startApp() {
+            const input = document.getElementById('input-name').value.trim();
+            studentName = input.length > 0 ? input : "Murid Cemerlang";
+            document.getElementById('display-student-name').innerText = studentName;
+            
+            // Update avatars across screens
+            document.getElementById('demo-avatar').innerText = selectedAvatarIcon;
+            document.getElementById('game-avatar').innerText = selectedAvatarIcon;
+
+            showScreen('screen-induksi');
+            speak("Selamat datang " + studentName + "! Mari belajar pergerakan haiwan terbang.");
+        }
+
+        function showScreen(screenId) {
+            document.querySelectorAll('.screen').forEach(s => s.classList.remove('active'));
+            document.getElementById(screenId).classList.add('active');
+        }
+
+        // --- STEP 1: SET INDUKSI LOGIC ---
+        let correctAnimalCount = 0;
+        function checkAnimal(isFlying, element) {
+            if (element.classList.contains('disabled')) return;
+
+            if (isFlying) {
+                element.style.borderColor = "#4CAF50";
+                element.style.background = "#E8F5E9";
+                playSound('success');
+                addStars(2);
+                correctAnimalCount++;
+                document.getElementById('induksi-feedback').innerText = "Syabas! Haiwan ini boleh terbang di udara! 🕊️";
+                speak("Bagus! Haiwan ini boleh terbang.");
+            } else {
+                element.style.borderColor = "#FF5722";
+                element.style.background = "#FFEBEE";
+                playSound('wrong');
+                document.getElementById('induksi-feedback').innerText = "Aduhai, haiwan ini tidak boleh terbang di udara! Try lagi. 🐱";
+                speak("Gajah dan kucing tidak terbang.");
+            }
+            element.classList.add('disabled');
+
+            if (correctAnimalCount >= 2) {
+                document.getElementById('btn-to-demo').style.display = "inline-flex";
+            }
+        }
+
+        // --- STEP 2: DEMO LOGIC ---
+        function playDemo(type) {
+            const avatar = document.getElementById('demo-avatar');
+            const text = document.getElementById('demo-instruction');
+
+            if (type === 'rendah') {
+                avatar.className = "bird-avatar rendah";
+                text.innerHTML = "<b>PERGERAKAN TERBANG RENDAH:</b><br>Bongkokkan badan sedikit, rendahkan lutut, dan kepakkan tangan perlahan-lahan.";
+                speak("Terbang rendah. Bongkokkan sedikit badan sambil mengepak tangan.");
+                playSound('success');
+            } else {
+                avatar.className = "bird-avatar tinggi";
+                text.innerHTML = "<b>PERGERAKAN TERBANG TINGGI:</b><br>Berdiri tegak, jengketkan kaki, mendongak sedikit dan kepakkan tangan tinggi!";
+                speak("Terbang tinggi. Berdiri tegak dan jengket sambil mengepak tangan tinggi.");
+                playSound('success');
+            }
+        }
+
+        // --- STEP 3: GAME CHALLENGE LOGIC ---
+        function startChallenge() {
+            showScreen('screen-game');
+            gameRound = 0;
+            nextGameRound();
+        }
+
+        function nextGameRound() {
+            if (gameRound >= maxRounds) {
+                // Finish Game
+                speak("Tahniah! Permainan selesai. Mari lakukan regangan.");
+                showScreen('screen-penutup');
+                startCooldownTimer();
+                return;
+            }
+
+            gameRound++;
+            document.getElementById('game-progress').style.width = ((gameRound / maxRounds) * 100) + "%";
+
+            // Increase speed on later rounds (Step 8 in lesson plan)
+            if (gameRound > 3) {
+                speedLevel = 2;
+                document.getElementById('speed-indicator').innerText = "Kelajuan: Laju! ⚡⚡";
+                document.getElementById('speed-indicator').style.background = "#FFCDD2";
+            } else {
+                speedLevel = 1;
+                document.getElementById('speed-indicator').innerText = "Kelajuan: Normal 🐢";
+            }
+
+            // Pick random command
+            currentCommand = Math.random() > 0.5 ? 'tinggi' : 'rendah';
+            const commandBox = document.getElementById('command-box');
+
+            if (currentCommand === 'tinggi') {
+                commandBox.className = "command-banner command-tinggi";
+                commandBox.innerHTML = "👆 TERBANG TINGGI!";
+                speak("Terbang tinggi!");
+            } else {
+                commandBox.className = "command-banner command-rendah";
+                commandBox.innerHTML = "👇 TERBANG RENDAH!";
+                speak("Terbang rendah!");
+            }
+        }
+
+        function submitAction(userChoice) {
+            const avatar = document.getElementById('game-avatar');
+
+            if (userChoice === currentCommand) {
+                playSound('success');
+                addStars(3);
+                avatar.className = "bird-avatar " + userChoice;
+                
+                // Show positive feedback (Step 10 in lesson plan)
+                document.getElementById('command-box').innerHTML = "✅ TEPAT & HEBAT!";
+                setTimeout(() => {
+                    nextGameRound();
+                }, speedLevel === 1 ? 1200 : 800);
+            } else {
+                playSound('wrong');
+                document.getElementById('command-box').innerHTML = "❌ CUBA LAGI!";
+                speak("Cuba lagi, perhatikan arahan!");
+            }
+        }
+
+        // --- STEP 4: PENUTUP / REGANGAN ---
+        function startCooldownTimer() {
+            let timeLeft = 10;
+            const timerDisplay = document.getElementById('stretch-timer');
+            speak("Mari lakukan regangan ringan untuk menenangkan badan.");
+
+            const interval = setInterval(() => {
+                timeLeft--;
+                timerDisplay.innerText = timeLeft + " Saat Regangan";
+                if (timeLeft <= 0) {
+                    clearInterval(interval);
+                    timerDisplay.innerText = "✨ Regangan Selesai!";
+                    playSound('success');
+                }
+            }, 1000);
+        }
+
+        // --- STEP 5: REFLEKSI KUIZ (Step 12-14 in lesson plan) ---
+        const quizQuestions = [
+            {
+                q: "1. Apakah kedudukan badan semasa 'Terbang Rendah'?",
+                options: [
+                    { text: "Bongkokkan badan & kepak tangan", correct: true, icon: "👇" },
+                    { text: "Lompat tinggi-tinggi", correct: false, icon: "🦘" }
+                ]
+            },
+            {
+                q: "2. Apakah kedudukan badan semasa 'Terbang Tinggi'?",
+                options: [
+                    { text: "Duduk di atas lantai", correct: false, icon: "🧘" },
+                    { text: "Berdiri tegak, jengket & kepak tangan", correct: true, icon: "👆" }
+                ]
+            }
+        ];
+
+        function startRefleksiQuiz() {
+            quizIndex = 0;
+            showScreen('screen-quiz');
+            loadQuizQuestion();
+        }
+
+        function loadQuizQuestion() {
+            const qData = quizQuestions[quizIndex];
+            document.getElementById('quiz-question').innerText = qData.q;
+            speak(qData.q);
+
+            const optionsGrid = document.getElementById('quiz-options');
+            optionsGrid.innerHTML = "";
+            document.getElementById('quiz-feedback').innerText = "";
+
+            qData.options.forEach(opt => {
+                const card = document.createElement('div');
+                card.className = "card";
+                card.style.width = "220px";
+                card.innerHTML = `<span class="emoji-icon">${opt.icon}</span><b>${opt.text}</b>`;
+                card.onclick = () => answerQuiz(opt.correct, card);
+                optionsGrid.appendChild(card);
+            });
+        }
+
+        function answerQuiz(isCorrect, cardEl) {
+            if (isCorrect) {
+                cardEl.style.background = "#C8E6C9";
+                playSound('success');
+                addStars(5);
+                document.getElementById('quiz-feedback').innerText = "Jawapan Tepat! Syabas!";
+                speak("Jawapan tepat!");
+
+                setTimeout(() => {
+                    quizIndex++;
+                    if (quizIndex < quizQuestions.length) {
+                        loadQuizQuestion();
+                    } else {
+                        showFinalCert();
+                    }
+                }, 1500);
+            } else {
+                cardEl.style.background = "#FFCDD2";
+                playSound('wrong');
+                document.getElementById('quiz-feedback').innerText = "Salah, cuba ingati semula aksi pergerakan.";
+                speak("Cuba jawapan yang satu lagi.");
+            }
+        }
+
+        // --- STEP 6: SIJIL & REFLEKSI GURU ---
+        function showFinalCert() {
+            showScreen('screen-cert');
+            document.getElementById('cert-name').innerText = studentName;
+            document.getElementById('cert-stars').innerText = stars;
+
+            // TP Level calculation based on stars achieved
+            let tpBadge = "Tahap Penguasaan: TP3 (Sangat Baik)";
+            let evalText = "Murid berupaya mengawal pergerakan badan dan melakukan aksi terbang tinggi serta rendah mengikut arahan dengan imbangan yang sangat baik.";
+
+            if (stars < 15) {
+                tpBadge = "Tahap Penguasaan: TP1 (Tahu)";
+                evalText = "Murid memerlukan bimbingan berterusan untuk membuat pergerakan mengikut arahan.";
+            } else if (stars < 25) {
+                tpBadge = "Tahap Penguasaan: TP2 (Tahu & Boleh)";
+                evalText = "Murid boleh melakukan pergerakan terbang tinggi dan rendah mengikut arahan dengan baik.";
+            }
+
+            document.getElementById('cert-tp').innerText = tpBadge;
+            document.getElementById('cert-eval').innerText = "Catatan Refleksi Guru: " + evalText;
+            speak("Tahniah " + studentName + "! Anda mendapat " + tpBadge);
+        }
+    </script>
+</body>
+</html>
